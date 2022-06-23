@@ -1,5 +1,5 @@
 {
-  "name": "esea-scraper",
+  "name": "@apina-32/esea-scraper",
   "version": "1.0.0",
   "description": "Pull data from ESEA profiles",
   "main": "index.js",
