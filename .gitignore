@@ -24,6 +24,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 .lock-wscript
 build/Release
 node_modules/
+dist/
 jspm_packages/
 .npm
 *.tgz

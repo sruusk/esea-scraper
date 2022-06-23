@@ -2,9 +2,18 @@
   "name": "esea-scraper",
   "version": "1.0.0",
   "description": "Pull data from ESEA profiles",
-  "main": "index.js",
+  "main": "src/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "run": "node index.js"
+    "start": "node dist/index.js",
+    "clean": "rimraf dist",
+    "prebuild": "npm run clean",
+    "build": "tsc",
+    "preversion": "npm run build",
+    "postversion": "git push --follow-tags",
+    "test": "jest"
   },
   "keywords": [
     "ESEA",
@@ -15,6 +24,13 @@
     "type": "git",
     "url": "https://github.com/Apina-32/esea-scraper.git"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "Apina-32",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^28.1.3",
+    "jest": "^28.1.1",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^28.0.5",
+    "typescript": "^4.7.4"
+  }
 }
