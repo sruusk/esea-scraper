@@ -11,6 +11,10 @@
     "csgo",
     "scraper"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Apina-32/esea-scraper.git"
+  },
   "author": "",
   "license": "ISC"
 }
