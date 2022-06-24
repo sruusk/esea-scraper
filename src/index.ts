@@ -1,4 +1,7 @@
 import { getMessage } from './utils'
-export function sayMessage() {
-    console.log(getMessage())
+import {test} from './hero'
+export async function sayMessage() {
+    await test();
 }
+
+sayMessage();
