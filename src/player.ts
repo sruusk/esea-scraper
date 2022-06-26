@@ -3,6 +3,7 @@ import * as chrono from 'chrono-node';
 import Hero from '@ulixee/hero';
 import {BanType, PlayerOutput,} from './player-types';
 import {EseaScraper} from './index';
+import { setTimeout } from 'timers/promises';
 
 function booleanToInt(boolean?: boolean): number | undefined {
   if (boolean === true) return 1;
@@ -46,13 +47,11 @@ function parseEseaDate(dateString: string): Date {
 
 export async function getPlayer(
   this: EseaScraper,
-  anySteamId: string | bigint
+  eseaProfileId: string | bigint
 ): Promise<PlayerOutput> {
   const hero = await this.createHero();
   try {
-    const steamId64 = new SteamID(anySteamId).getSteamID64();
-
-    let statsUrl = `https://play.esea.net/users/${steamId64}/stats?filters[type_scopes]=pug&filters[period_types]=career`;
+    let statsUrl = `https://play.esea.net/users/${eseaProfileId}/stats?filters[type_scopes]=pug&filters[period_types]=career`;
 
     this.debug(`Going to ${statsUrl}`);
     const gotoResp = await hero.goto(statsUrl, { timeoutMs: this.timeout });
@@ -63,6 +62,8 @@ export async function getPlayer(
       throw new Error(`play.esea.net returned a non-200 response: ${statusCode}`);
     }
 
+    await this.debug(await hero.document.documentElement.querySelector('body').innerHTML);
+    await setTimeout(10000);
     const eseaUserName = await hero.document.querySelector('.eNlNUK').title;
     const eseaPictureUrl = await hero.document.querySelector('.bnPUMF').src;
 
@@ -115,7 +116,7 @@ export async function getPlayer(
 
     // Get MMR
     let mmr: number | undefined;
-    let profileUrl = `https://play.esea.net/users/${steamId64}`;
+    let profileUrl = `https://play.esea.net/users/${eseaProfileId}`;
 
     this.debug(`Going to ${profileUrl}`);
     const response = await hero.goto(statsUrl, { timeoutMs: this.timeout });

@@ -54,7 +54,7 @@ export class EseaScraper {
 
   constructor(options?: ScraperOptions) {
     this.heroOptions = {
-      blockedResourceTypes: ['All'],
+      blockedResourceTypes: ['None'],
       ...options?.heroOverrides,
     };
     this.timeout = options?.timeout ?? this.timeout;

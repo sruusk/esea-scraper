@@ -35,7 +35,7 @@ describe('The player scrapers', () => {
   });
 
   it('should throw on invalid get', async () => {
-    await expect(scraper.getPlayer('999')).rejects.toThrow(
+    await expect(scraper.getPlayer('208493849384')).rejects.toThrow(
       'play.esea.net returned a non-200 response: 404'
     );
   });
