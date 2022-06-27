@@ -45,7 +45,7 @@
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.12.1",
     "@ulixee/hero-core": "^2.0.0-alpha.5",
-    "eslint": "^8.10.0",
+    "eslint": "^8.18.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.4.0",
     "eslint-plugin-import": "^2.25.4",
@@ -58,7 +58,7 @@
     "semantic-release": "^19.0.3",
     "ts-jest": "^27.1.3",
     "ts-node": "^10.8.1",
-    "typescript": "^4.5.5"
+    "typescript": "^4.7.4"
   },
   "peerDependencies": {
     "@ulixee/hero-core": ">2.0.0-alpha <3"
