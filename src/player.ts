@@ -1,48 +1,24 @@
-import SteamID from 'steamid';
-import * as chrono from 'chrono-node';
 import Hero from '@ulixee/hero';
-import {BanType, PlayerOutput,} from './player-types';
+import {PlayerOutput} from './player-types';
 import {EseaScraper} from './index';
-import { setTimeout } from 'timers/promises';
 
-function booleanToInt(boolean?: boolean): number | undefined {
-  if (boolean === true) return 1;
-  if (boolean === false) return 0;
-  return boolean;
-}
-
-function parsePercent(string: string, radix?: number): number {
-  return parseInt(string, radix) / 100;
-}
-
-async function parseNumber(
-  hero: Omit<Hero, 'then'>,
-  parseFunc: typeof parseInt | typeof parseFloat,
-  selector: string
-): Promise<number | undefined> {
-  const elem = hero.document.querySelector(selector);
-  if (!(await elem.$exists)) return undefined;
-  return parseFunc(await elem.innerText, 10);
-}
-
-async function parseMatches(hero: Omit<Hero, 'then'>, wins: number): Promise<number> {
-  let losses = await parseNumber(hero, parseInt, '.cuKliN');
-  let ties = await parseNumber(hero, parseInt, '.hRjBLV');
-  if(wins === undefined || losses === undefined || ties === undefined) {
-    losses = 0;
-    ties = 0;
+async function fetch(hero: Omit<Hero, 'then'>, url: string): Promise<any> {
+  const fetchResponse = await hero.fetch(url);
+  // Check for page error
+  const statusCode = await fetchResponse.status;
+  if (statusCode !== 200) {
+    throw new Error(`${url} returned a non-200 response: ${statusCode}`);
   }
-  return wins + losses + ties;
+  return fetchResponse.json();
 }
 
-function parseStat(stats: any, statIndex: number): number {
-  const stat = stats[statIndex];
-  return parseInt(stat.textContent, 10);
-}
-
-function parseEseaDate(dateString: string): Date {
-  // 11/18/2021
-  return chrono.parseDate(dateString);
+function getStat(stats: [any], parseFunc: typeof parseInt | typeof parseFloat, statName: string): number{
+  for(const stat of stats) {
+    if (stat.name === statName) {
+      return parseFunc(stat.value, 10);
+    }
+  }
+  return -1;
 }
 
 export async function getPlayer(
@@ -51,99 +27,66 @@ export async function getPlayer(
 ): Promise<PlayerOutput> {
   const hero = await this.createHero();
   try {
-    let statsUrl = `https://play.esea.net/users/${eseaProfileId}/stats?filters[type_scopes]=pug&filters[period_types]=career`;
+    let origin = 'https://play.esea.net/api';
+    let userUrl = `${origin}/users/${eseaProfileId}`;
+    let profileUrl = `${origin}/users/${eseaProfileId}/profile`;
+    let statsUrl = `${origin}/users/${eseaProfileId}/stats?filters[type_scopes]=pug&filters[period_types]=career`;
 
-    this.debug(`Going to ${statsUrl}`);
-    const gotoResp = await hero.goto(statsUrl, { timeoutMs: this.timeout });
-
-    // Check for page error
-    const { statusCode } = gotoResp.response;
+    this.debug(`Going to ${origin}`);
+    const originResponse = await hero.goto(origin, { timeoutMs: this.timeout });
+    const statusCode = originResponse.response.statusCode;
     if (statusCode !== 200) {
       throw new Error(`play.esea.net returned a non-200 response: ${statusCode}`);
     }
 
-    await this.debug(await hero.document.documentElement.querySelector('body').innerHTML);
-    await setTimeout(10000);
-    const eseaUserName = await hero.document.querySelector('.eNlNUK').title;
-    const eseaPictureUrl = await hero.document.querySelector('.bnPUMF').src;
+    this.debug(`Fetching ${userUrl}`);
+    const userResponse = await fetch(hero, userUrl);
 
-    let wins = await parseNumber(hero, parseInt, '.kqhCcR');
-    this.debug(`wins: ${wins}`)
-    if(wins === undefined) wins = 0;
-    const matches = await parseMatches(hero, wins);
-    this.debug(`matches: ${matches}`)
+    this.debug(`Fetching ${profileUrl}`);
+    const profileResponse = await fetch(hero, profileUrl);
 
-    const lastGameAndBanElem = hero.document.querySelector('.fAkqrh');
-    let lastGameString: string | undefined;
-    if ((await lastGameAndBanElem.$exists) && (await lastGameAndBanElem.firstChild.$exists)) {
-      lastGameString = (await lastGameAndBanElem.firstChild.textContent)?.trim() as string;
-    }
+    this.debug(`Fetching ${statsUrl}`);
+    const statsResponse = await fetch(hero, statsUrl);
 
-    this.debug(`lastGameString: ${lastGameString}`);
-    let lastGameDate: Date | undefined;
-    if (lastGameString) {
-      lastGameDate = parseEseaDate(lastGameString);
-    }
+    await hero.close();
 
-    let banString;
-    let banType: BanType | undefined;
-    let banDate: Date | undefined;
+    const user = userResponse.data;
+    const profile = profileResponse.data;
+    const stats = statsResponse.data.server_stats;
 
-    let errorMessage: string | undefined;
-    if (matches === 0) {
-      errorMessage = "No matches found";
-    }
-
-    if (errorMessage) {
-      this.debug(errorMessage);
-      await hero.close();
+    if (stats.record === undefined) {
       return {
         summary: {
-          eseaUserName,
-          eseaPictureUrl,
-          lastGameDate,
-          banType,
-          banDate,
+          age: user.age,
+          alias: user.alias,
+          avatar_url: user.avatar_full_url,
+          banType: user.ban,
+          name: user.name
         },
       };
     }
 
-    const statsElem = hero.document.querySelector('.eiQngx').querySelectorAll('.jcipWc');
-    const killDeathRatio = parseStat(statsElem, 0) / parseStat(statsElem, 2);
-    const headshotRate = parseStat(statsElem, 11);
-    const averageDamageRound = parseStat(statsElem, 12);
+    const wins = parseInt(stats.record.win, 10);
+    const losses = parseInt(stats.record.loss, 10);
+    const ties = parseInt(stats.record.tie, 10);
+    const totalGames = wins + losses + ties;
 
-
-    // Get MMR
-    let mmr: number | undefined;
-    let profileUrl = `https://play.esea.net/users/${eseaProfileId}`;
-
-    this.debug(`Going to ${profileUrl}`);
-    const response = await hero.goto(statsUrl, { timeoutMs: this.timeout });
-
-    // Check for page error
-    const profileStatusCode = response.response.statusCode
-    if (profileStatusCode !== 200) {
-      throw new Error(`play.esea.net returned a non-200 response: ${profileStatusCode}`);
-    }
-    mmr = await parseNumber(hero, parseInt, '.jICdBM');
-
-    await hero.close();
     return {
       summary: {
-        eseaUserName,
-        eseaPictureUrl,
-        lastGameDate,
-        banType,
-        banDate,
+        age: user.age,
+        alias: user.alias,
+        avatar_url: user.avatar_full_url,
+        banType: user.ban,
+        name: user.name
       },
       stats: {
-        killDeathRatio,
-        wins,
-        mmr,
-        matches,
-        headshotRate,
-        averageDamageRound
+        killDeathRatio: getStat(stats.stats, parseInt, 'all.frags') / getStat(stats.stats, parseInt, 'all.deaths'),
+        wins: wins,
+        rank: wins > 5 ? profile.rank.current.rank : undefined,
+        mmr: wins > 5 ? parseInt(profile.rank.current.mmr, 10) : undefined,
+        matches: totalGames,
+        headshotRate: getStat(stats.stats, parseFloat, 'all.hs_percentage'),
+        averageDamageRound: getStat(stats.stats, parseFloat, 'all.adr'),
       }
     };
   } catch (err) {

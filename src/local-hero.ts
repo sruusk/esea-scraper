@@ -1,8 +1,4 @@
-import DefaultHero, {
-  ConnectionToHeroCore,
-  IConnectionToCoreOptions,
-  IHeroCreateOptions,
-} from '@ulixee/hero';
+import DefaultHero, {ConnectionToHeroCore, IConnectionToCoreOptions, IHeroCreateOptions,} from '@ulixee/hero';
 import TransportBridge from '@ulixee/net/lib/TransportBridge.js';
 import ShutdownHandler from '@ulixee/commons/lib/ShutdownHandler.js';
 import type Core from '@ulixee/hero-core';

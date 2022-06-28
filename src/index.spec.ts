@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import { EseaScraper } from './index';
-import { PlayerOutput } from './player-types';
+import {EseaScraper} from './index';
+import {PlayerOutput} from './player-types';
 
 jest.setTimeout(5 * 60 * 1000);
 describe('The scraper class', () => {

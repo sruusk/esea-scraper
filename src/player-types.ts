@@ -6,15 +6,16 @@ export enum BanType {
 }
 
 export interface PlayerSummary {
-  eseaUserName: string;
-  eseaPictureUrl: string;
-  lastGameDate: Date | undefined;
+  age: number;
+  alias: string
+  avatar_url: string;
   banType?: BanType | undefined;
-  banDate?: Date | undefined;
+  name: string;
 }
 
 export interface PlayerStats {
   killDeathRatio: number;
+  rank: string | undefined;
   mmr: number | undefined;
   wins: number;
   matches: number;
