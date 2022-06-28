@@ -1,4 +1,3 @@
-[![Node.js CI](https://github.com/Apina-32/esea-scraper/actions/workflows/node.js.yml/badge.svg?branch=master)](https://github.com/Apina-32/esea-scraper/actions/workflows/node.js.yml)
 # esea-scraper
 
 A consumable Node package to scrape data from ESEA.
