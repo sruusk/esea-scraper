@@ -25,7 +25,7 @@
   "dependencies": {
     "@ulixee/commons": "^2.0.0-alpha.5",
     "@ulixee/hero": "^2.0.0-alpha.6",
-    "@ulixee/net": "^2.0.0-alpha.5",
+    "@ulixee/net": "^2.0.0-alpha.6",
     "chrono-node": "^2.3.8",
     "debug": "^4.3.3",
     "p-queue": "^6.6.2",
