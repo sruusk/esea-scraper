@@ -76,6 +76,9 @@ export async function getPlayer(
     const losses = parseInt(stats.record.loss, 10);
     const ties = parseInt(stats.record.tie, 10);
     const totalGames = wins + losses + ties;
+    const kills = getStat(stats.stats, parseInt, 'all.frags');
+    const deaths = getStat(stats.stats, parseInt, 'all.deaths');
+    const kd = kills / deaths;
 
     return {
       summary: {
@@ -87,10 +90,10 @@ export async function getPlayer(
         name: user.name,
       },
       stats: {
-        killDeathRatio:
-          getStat(stats.stats, parseInt, 'all.frags') /
-          getStat(stats.stats, parseInt, 'all.deaths'),
+        killDeathRatio: parseFloat(kd.toFixed(2)),
         wins: wins,
+        kills: kills,
+        deaths: deaths,
         rank: wins > 5 ? profile.rank.current.rank : undefined,
         mmr: wins > 5 ? parseInt(profile.rank.current.mmr, 10) : undefined,
         matches: totalGames,

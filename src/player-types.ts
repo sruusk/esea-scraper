@@ -16,6 +16,8 @@ export interface PlayerSummary {
 
 export interface PlayerStats {
   killDeathRatio: number;
+  kills: number;
+  deaths: number;
   rank: string | undefined;
   mmr: number | undefined;
   wins: number;
