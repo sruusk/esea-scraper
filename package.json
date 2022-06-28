@@ -24,7 +24,7 @@
   "license": "MIT",
   "dependencies": {
     "@ulixee/commons": "^2.0.0-alpha.6",
-    "@ulixee/hero": "^2.0.0-alpha.6",
+    "@ulixee/hero": "^2.0.0-alpha.7",
     "@ulixee/net": "^2.0.0-alpha.6",
     "chrono-node": "^2.3.8",
     "debug": "^4.3.3",
