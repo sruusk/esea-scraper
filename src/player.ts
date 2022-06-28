@@ -66,6 +66,7 @@ export async function getPlayer(
           alias: user.alias,
           avatar_url: user.avatar_full_url,
           banType: user.ban,
+          id: user.id,
           name: user.name,
         },
       };
@@ -82,6 +83,7 @@ export async function getPlayer(
         alias: user.alias,
         avatar_url: user.avatar_full_url,
         banType: user.ban,
+        id: user.id,
         name: user.name,
       },
       stats: {

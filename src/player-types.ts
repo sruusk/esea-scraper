@@ -10,6 +10,7 @@ export interface PlayerSummary {
   alias: string;
   avatar_url: string;
   banType?: BanType | undefined;
+  id: string;
   name: string;
 }
 

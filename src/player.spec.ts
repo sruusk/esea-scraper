@@ -33,6 +33,7 @@ describe('The player scrapers', () => {
         expect(resp.summary).toMatchObject({
           age: expect.any(Number),
           alias: expect.any(String),
+          id: expect.any(Number),
         });
         return resp;
       })
