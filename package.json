@@ -29,7 +29,7 @@
     "@ulixee/net": "^2.0.0-alpha.5",
     "chrono-node": "^2.3.7",
     "debug": "^4.3.3",
-    "p-queue": "^6.6.2",
+    "p-queue": "^7.2.0",
     "steamid": "^2.0.0"
   },
   "devDependencies": {
