@@ -1,8 +1,8 @@
-import debug, {Debugger} from 'debug';
-import Hero, {IHeroCreateOptions} from '@ulixee/hero';
+import debug, { Debugger } from 'debug';
+import Hero, { IHeroCreateOptions } from '@ulixee/hero';
 import PQueue from 'p-queue';
 import type Core from '@ulixee/hero-core';
-import {getPlayer} from './player';
+import { getPlayer } from './player';
 import LocalHero from './local-hero';
 
 export * from './player-types';
@@ -90,7 +90,6 @@ export class EseaScraper {
     }
     return new Hero(this.heroOptions);
   }
-
 
   public getPlayer(...args: Parameters<typeof getPlayer>): ReturnType<typeof getPlayer> {
     return this.queue.add(() => getPlayer.bind(this)(...args));

@@ -1,6 +1,6 @@
 import Hero from '@ulixee/hero';
-import {PlayerOutput} from './player-types';
-import {EseaScraper} from './index';
+import { PlayerOutput } from './player-types';
+import { EseaScraper } from './index';
 
 async function fetch(hero: Omit<Hero, 'then'>, url: string): Promise<any> {
   const fetchResponse = await hero.fetch(url);
@@ -12,13 +12,17 @@ async function fetch(hero: Omit<Hero, 'then'>, url: string): Promise<any> {
   return fetchResponse.json();
 }
 
-function getStat(stats: [any], parseFunc: typeof parseInt | typeof parseFloat, statName: string): number{
-  for(const stat of stats) {
+function getStat(
+  stats: [any],
+  parseFunc: typeof parseInt | typeof parseFloat,
+  statName: string
+): number {
+  for (const stat of stats) {
     if (stat.name === statName) {
       return parseFunc(stat.value, 10);
     }
   }
-  return -1;
+  throw new Error(`No ${statName} stat found`);
 }
 
 export async function getPlayer(
@@ -36,6 +40,7 @@ export async function getPlayer(
     const originResponse = await hero.goto(origin, { timeoutMs: this.timeout });
     const statusCode = originResponse.response.statusCode;
     if (statusCode !== 200) {
+      // noinspection ExceptionCaughtLocallyJS
       throw new Error(`play.esea.net returned a non-200 response: ${statusCode}`);
     }
 
@@ -61,7 +66,7 @@ export async function getPlayer(
           alias: user.alias,
           avatar_url: user.avatar_full_url,
           banType: user.ban,
-          name: user.name
+          name: user.name,
         },
       };
     }
@@ -77,17 +82,19 @@ export async function getPlayer(
         alias: user.alias,
         avatar_url: user.avatar_full_url,
         banType: user.ban,
-        name: user.name
+        name: user.name,
       },
       stats: {
-        killDeathRatio: getStat(stats.stats, parseInt, 'all.frags') / getStat(stats.stats, parseInt, 'all.deaths'),
+        killDeathRatio:
+          getStat(stats.stats, parseInt, 'all.frags') /
+          getStat(stats.stats, parseInt, 'all.deaths'),
         wins: wins,
         rank: wins > 5 ? profile.rank.current.rank : undefined,
         mmr: wins > 5 ? parseInt(profile.rank.current.mmr, 10) : undefined,
         matches: totalGames,
         headshotRate: getStat(stats.stats, parseFloat, 'all.hs_percentage'),
         averageDamageRound: getStat(stats.stats, parseFloat, 'all.adr'),
-      }
+      },
     };
   } catch (err) {
     await hero.close();

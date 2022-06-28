@@ -7,7 +7,7 @@ export enum BanType {
 
 export interface PlayerSummary {
   age: number;
-  alias: string
+  alias: string;
   avatar_url: string;
   banType?: BanType | undefined;
   name: string;

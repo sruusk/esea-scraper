@@ -7,8 +7,7 @@
   "module": "dist/index.esm.js",
   "scripts": {
     "test": "jest --coverage",
-    "build": "rimraf dist && rollup -c rollup.config.ts",
-    "lint": "tsc --noEmit && eslint src/**/*.ts"
+    "build": "rimraf dist && rollup -c rollup.config.ts"
   },
   "keywords": [
     "esea",

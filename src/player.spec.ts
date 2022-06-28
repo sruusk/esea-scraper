@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import {EseaScraper} from './index';
+import { EseaScraper } from './index';
 
 jest.setTimeout(5 * 60 * 1000);
 describe('The player scrapers', () => {
@@ -12,7 +12,6 @@ describe('The player scrapers', () => {
   afterAll(async () => {
     await scraper.shutdown();
   });
-
 
   it('should return handle 10 simultaneous requests (status command)', async () => {
     const steamIDs = [
@@ -33,7 +32,7 @@ describe('The player scrapers', () => {
         const resp = await scraper.getPlayer(steamId);
         expect(resp.summary).toMatchObject({
           age: expect.any(Number),
-          alias: expect.any(String)
+          alias: expect.any(String),
         });
         return resp;
       })
@@ -42,8 +41,8 @@ describe('The player scrapers', () => {
   });
 
   it('should throw on invalid get', async () => {
-    await expect(scraper.getPlayer('208493849384')).rejects.toThrow(
-      'play.esea.net returned a non-200 response: 404'
+    await expect(scraper.getPlayer('208493849384/adw/')).rejects.toThrow(
+      'https://play.esea.net/api/users/208493849384/adw/ returned a non-200 response: 404'
     );
   });
 });
