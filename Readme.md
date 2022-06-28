@@ -17,3 +17,11 @@ npm i esea-scraper @ulixee/hero-core
 ```
 
 Later, if you'd like to use a remote Hero Core, you can remove the `@ulixee/hero-core` peer dependency.
+
+### Example Usage
+
+```js
+const eseaScraper = require("esea-scraper");
+const esea = new eseaScraper.EseaScraper;
+await esea.getPlayer("2570455")
+```
