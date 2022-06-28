@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { EseaScraper } from './index';
+import {EseaScraper} from './index';
 
 jest.setTimeout(5 * 60 * 1000);
 describe('The player scrapers', () => {
@@ -17,16 +17,23 @@ describe('The player scrapers', () => {
   it('should return handle 10 simultaneous requests (status command)', async () => {
     const steamIDs = [
       '2742648',
-      '2746569'
+      '2746569',
+      '440390',
+      '2742648',
+      '2570455',
+      '2572609',
+      '751769',
+      '2487672',
+      '2573516',
+      '2738955',
     ];
 
     const results = await Promise.all(
       steamIDs.map(async (steamId) => {
         const resp = await scraper.getPlayer(steamId);
         expect(resp.summary).toMatchObject({
-          steamId64: expect.any(String),
-          steamProfileUrl: expect.any(String),
-          steamPictureUrl: expect.any(String),
+          age: expect.any(Number),
+          alias: expect.any(String)
         });
         return resp;
       })
