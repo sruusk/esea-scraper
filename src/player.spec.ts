@@ -15,7 +15,7 @@ describe('The player scrapers', () => {
 
   it('should return handle 10 simultaneous requests (status command)', async () => {
     const steamIDs = [
-      '2742648',
+      '974465',
       '2746569',
       '440390',
       '2742648',
