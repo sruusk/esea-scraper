@@ -12,6 +12,8 @@ export interface PlayerSummary {
   banType?: BanType | undefined;
   id: string;
   name: string;
+  twitch_username: string;
+  tier: string;
 }
 
 export interface PlayerStats {

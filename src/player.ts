@@ -68,6 +68,8 @@ export async function getPlayer(
           banType: user.ban,
           id: user.id,
           name: user.name,
+          twitch_username: user.twitch_username,
+          tier: user.tier,
         },
       };
     }
@@ -88,6 +90,8 @@ export async function getPlayer(
         banType: user.ban,
         id: user.id,
         name: user.name,
+        twitch_username: user.twitch_username,
+        tier: user.tier,
       },
       stats: {
         killDeathRatio: parseFloat(kd.toFixed(2)),
