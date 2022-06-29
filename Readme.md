@@ -1,3 +1,4 @@
+[![CodeQL](https://github.com/Apina-32/esea-scraper/actions/workflows/codeql.yml/badge.svg)](https://github.com/Apina-32/esea-scraper/actions/workflows/codeql.yml)
 # esea-scraper
 
 A consumable Node package to scrape data from ESEA.
