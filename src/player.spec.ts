@@ -14,7 +14,7 @@ describe('The player scrapers', () => {
   });
 
   it('should return handle 10 simultaneous requests (status command)', async () => {
-    const steamIDs = [
+    const eseaIDs = [
       '974465',
       '2746569',
       '440390',
@@ -28,8 +28,8 @@ describe('The player scrapers', () => {
     ];
 
     const results = await Promise.all(
-      steamIDs.map(async (steamId) => {
-        const resp = await scraper.getPlayer(steamId);
+        eseaIDs.map(async (eseaId) => {
+        const resp = await scraper.getPlayer(eseaId);
         expect(resp.summary).toMatchObject({
           age: expect.any(Number),
           alias: expect.any(String),
@@ -38,12 +38,34 @@ describe('The player scrapers', () => {
         return resp;
       })
     );
-    expect(results).toHaveLength(steamIDs.length);
+    expect(results).toHaveLength(eseaIDs.length);
   });
 
   it('should throw on invalid get', async () => {
     await expect(scraper.getPlayer('208493849384/adw/')).rejects.toThrow(
       'https://play.esea.net/api/users/208493849384/adw/ returned a non-200 response: 404'
     );
+  });
+
+  it('should return all statistics', async () => {
+      const response = await scraper.getPlayer('440390');
+      expect(response.summary).toMatchObject({
+        age: expect.any(Number),
+        alias: expect.any(String),
+        id: expect.any(Number),
+        tier: expect.any(String),
+      });
+      expect(response.stats).toMatchObject({
+        killDeathRatio: expect.any(Number),
+        kills: expect.any(Number),
+        deaths: expect.any(Number),
+        wins: expect.any(Number),
+        rank: expect.any(String),
+        mmr: expect.any(Number),
+        lastGameDate: expect.any(String),
+        matches: expect.any(Number),
+        headshotRate: expect.any(Number),
+        averageDamageRound: expect.any(Number),
+      });
   });
 });

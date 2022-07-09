@@ -39,6 +39,7 @@ export async function getPlayer(
     let userUrl = `${origin}/users/${eseaProfileId}`;
     let profileUrl = `${origin}/users/${eseaProfileId}/profile`;
     let statsUrl = `${origin}/users/${eseaProfileId}/stats?filters[type_scopes]=pug&filters[period_types]=career`;
+    let lastMatchUrl = `${origin}/users/${eseaProfileId}/matches?page_size=1`;
 
     this.debug(`Going to ${origin}`);
     const originResponse = await hero.goto(origin, { timeoutMs: this.timeout });
@@ -57,13 +58,12 @@ export async function getPlayer(
     this.debug(`Fetching ${statsUrl}`);
     const statsResponse = await fetch(hero, statsUrl);
 
-    await hero.close();
-
     const user = userResponse.data;
     const profile = profileResponse.data;
     const stats = statsResponse.data.server_stats;
 
     if (stats.record === undefined) {
+      await hero.close();
       return {
         summary: {
           age: user.age,
@@ -87,6 +87,13 @@ export async function getPlayer(
     const kd = kills / deaths;
     this.debug(`kills: ${kills}, deaths: ${deaths}, kd: ${kd}`);
 
+    // If the user has stats available, they must have atleas 1 match that we can fetch
+    this.debug(`Fetching ${lastMatchUrl}`);
+    const lastMatchResponse = await fetch(hero, lastMatchUrl);
+    const lastGameDate = lastMatchResponse.data[0].completed_at;
+
+    await hero.close();
+
     return {
       summary: {
         age: user.age,
@@ -108,6 +115,7 @@ export async function getPlayer(
         matches: totalGames,
         headshotRate: getStat(stats.stats, parseFloat, 'all.hs_percentage'),
         averageDamageRound: getStat(stats.stats, parseFloat, 'all.adr'),
+        lastGameDate: lastGameDate,
       },
     };
   } catch (err) {
