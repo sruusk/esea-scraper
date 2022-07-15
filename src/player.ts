@@ -45,6 +45,12 @@ export async function getPlayer(
     const originResponse = await hero.goto(origin, { timeoutMs: this.timeout });
     const statusCode = originResponse.response.statusCode;
     if (statusCode !== 200) {
+      // Check for cloudflare challenge
+      const title = await hero.document.querySelector("title");
+      if(title != undefined && await title.textContent === "Attention Required! | Cloudflare"){
+        throw new Error(`play.esea.net returned a non-200 response: ${statusCode}
+        Received cloudflare challenge. This is likely caused by an untrusted IP.`);
+      }
       // noinspection ExceptionCaughtLocallyJS
       throw new Error(`play.esea.net returned a non-200 response: ${statusCode}`);
     }
