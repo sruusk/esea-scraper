@@ -93,10 +93,9 @@ export async function getPlayer(
     const kd = kills / deaths;
     this.debug(`kills: ${kills}, deaths: ${deaths}, kd: ${kd}`);
 
-    // If the user has stats available, they must have atleas 1 match that we can fetch
     this.debug(`Fetching ${lastMatchUrl}`);
     const lastMatchResponse = await fetch(hero, lastMatchUrl);
-    const lastGameDate = lastMatchResponse.data[0].completed_at;
+    const lastGameDate = lastMatchResponse.data.length > 0 ? lastMatchResponse.data[0].completed_at : undefined;
 
     await hero.close();
 

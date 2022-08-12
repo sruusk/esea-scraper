@@ -22,7 +22,7 @@ export interface PlayerStats {
   deaths: number;
   rank: string | undefined;
   mmr: number | undefined;
-  lastGameDate: string;
+  lastGameDate: string | undefined;
   wins: number;
   matches: number;
   headshotRate: number;
