@@ -104,10 +104,10 @@ export async function getPlayer(
         age: user.age,
         alias: user.alias,
         avatar_url: user.avatar_full_url,
-        banType: user.ban,
+        banType: user.ban ? user.ban : undefined,
         id: user.id,
         name: user.name,
-        twitch_username: user.twitch_username,
+        twitch_username: user.twitch_username ? user.twitch_username : undefined,
         tier: user.tier,
       },
       stats: {
