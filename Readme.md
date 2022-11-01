@@ -2,7 +2,7 @@
 # esea-scraper
 
 A consumable Node package to scrape data from ESEA.
-Due to ESEAs API having a CORS policy and being protected by Cloudflare, the best approach is to spin up a headless 
+Due to ESEAs API being protected by Cloudflare, the best approach is to spin up a headless 
 browser and scrape the API.  
 [csgostatsgg-scraper](https://www.npmjs.com/package/csgostatsgg-scraper) is working as the base for this project.  
 [Ulixee Hero](https://ulixee.org/docs/hero) is used to bypass Cloudflare and CORS.
