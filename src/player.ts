@@ -25,10 +25,6 @@ function getStat(
   throw new Error(`No ${statName} stat found`);
 }
 
-function nullOrUndefined(value: any): boolean {
-  return value === null || value === undefined;
-}
-
 export async function getPlayer(
   this: EseaScraper,
   eseaProfileId: string | bigint
@@ -115,8 +111,8 @@ export async function getPlayer(
         wins: wins,
         kills: kills,
         deaths: deaths,
-        rank: nullOrUndefined(profile.rank.placement_matches_remaining) ? profile.rank.current.rank : undefined,
-        mmr: nullOrUndefined(profile.rank.placement_matches_remaining) ? parseInt(profile.rank.current.mmr, 10) : undefined,
+        rank: !profile.rank.placement_matches_remaining ? profile.rank.current.rank : undefined,
+        mmr: !profile.rank.placement_matches_remaining ? parseInt(profile.rank.current.mmr, 10) : undefined,
         matches: totalGames,
         headshotRate: getStat(stats.stats, parseFloat, 'all.hs_percentage'),
         averageDamageRound: getStat(stats.stats, parseFloat, 'all.adr'),
