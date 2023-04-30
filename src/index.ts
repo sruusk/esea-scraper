@@ -2,7 +2,7 @@ import debug, { Debugger } from 'debug';
 import Hero, { IHeroCreateOptions } from '@ulixee/hero';
 import PQueue from 'p-queue';
 import type Core from '@ulixee/hero-core';
-import { getPlayer } from './player';
+import { getPlayer, getPlayerFromSteamId64 } from './player';
 import LocalHero from './local-hero';
 
 export * from './player-types';
@@ -93,5 +93,11 @@ export class EseaScraper {
 
   public getPlayer(...args: Parameters<typeof getPlayer>): ReturnType<typeof getPlayer> {
     return this.queue.add(() => getPlayer.bind(this)(...args));
+  }
+
+  public getPlayerFromSteamId64(
+    ...args: Parameters<typeof getPlayerFromSteamId64>
+  ): ReturnType<typeof getPlayerFromSteamId64> {
+    return this.queue.add(() => getPlayerFromSteamId64.bind(this)(...args));
   }
 }
