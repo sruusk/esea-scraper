@@ -33,7 +33,9 @@ async function getPlayerProfile(hero: Omit<Hero, 'then'>, steamId64: string): Pr
 
   const userSearchUrl = `https://play.esea.net/api/search?query=${steamId}&index=users`;
   const userResponse = await fetch(hero, userSearchUrl);
-
+  if (userResponse.data.length === 0) {
+    throw new Error(`No user found for ${steamId64}`);
+  }
   const userProfile = userResponse.data[0];
   return {
     alias: userProfile.title,

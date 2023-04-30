@@ -91,6 +91,12 @@ describe('The player scrapers', () => {
     });
   });
 
+  it('should throw when no esea account found for SteamID', async () => {
+    await expect(scraper.getPlayer('76561198165506097')).rejects.toThrow(
+      'No user found for 76561198165506097'
+    );
+  });
+
   it('should return esea profile for valid steamid', async () => {
     const response = await scraper.getPlayerFromSteamId64('76561198162880095');
 
