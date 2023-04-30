@@ -1,8 +1,8 @@
 /* eslint-disable object-shorthand */
 import Hero from '@ulixee/hero';
 import SteamID from 'steamid';
-import { PlayerOutput, PlayerProfile } from './player-types';
-import { EseaScraper } from './index';
+import {PlayerOutput, PlayerProfile} from './player-types';
+import {EseaScraper} from './index';
 
 async function fetch(hero: Omit<Hero, 'then'>, url: string): Promise<any> {
   const fetchResponse = await hero.fetch(url);
@@ -28,6 +28,20 @@ function getStat(
   throw new Error(`No ${statName} stat found`);
 }
 
+async function getPlayerProfile(hero: Omit<Hero, 'then'>, steamId64: string): Promise<PlayerProfile> {
+  const steamId = new SteamID(steamId64).getSteam2RenderedID(true).replace('STEAM_', '');
+
+  const userSearchUrl = `https://play.esea.net/api/search?query=${steamId}&index=users`;
+  const userResponse = await fetch(hero, userSearchUrl);
+
+  const userProfile = userResponse.data[0];
+  return {
+    alias: userProfile.title,
+    id: userProfile.link.replace('/users/', ''),
+    link: userProfile.link,
+  };
+}
+
 export async function getPlayer(
   this: EseaScraper,
   eseaProfileId: string | bigint
@@ -35,10 +49,6 @@ export async function getPlayer(
   const hero = await this.createHero();
   try {
     const origin = 'https://play.esea.net/api';
-    const userUrl = `${origin}/users/${eseaProfileId}`;
-    const profileUrl = `${origin}/users/${eseaProfileId}/profile`;
-    const statsUrl = `${origin}/users/${eseaProfileId}/stats?filters[type_scopes]=pug&filters[period_types]=career`;
-    const lastMatchUrl = `${origin}/users/${eseaProfileId}/matches?page_size=1`;
 
     this.debug(`Going to ${origin}`);
     const originResponse = await hero.goto(origin, { timeoutMs: this.timeout });
@@ -53,6 +63,15 @@ export async function getPlayer(
       // noinspection ExceptionCaughtLocallyJS
       throw new Error(`play.esea.net returned a non-200 response: ${statusCode}`);
     }
+
+    // Check if the input is a SteamID64 and if so, get the ESEA profile ID from it
+    if(/^7656119\d{10}$/.test(eseaProfileId.toString()))
+      eseaProfileId = (await getPlayerProfile(hero, eseaProfileId.toString())).id;
+
+    const userUrl = `${origin}/users/${eseaProfileId}`;
+    const profileUrl = `${origin}/users/${eseaProfileId}/profile`;
+    const statsUrl = `${origin}/users/${eseaProfileId}/stats?filters[type_scopes]=pug&filters[period_types]=career`;
+    const lastMatchUrl = `${origin}/users/${eseaProfileId}/matches?page_size=1`;
 
     this.debug(`Fetching ${userUrl}`);
     const userResponse = await fetch(hero, userUrl);
@@ -137,10 +156,7 @@ export async function getPlayerFromSteamId64(
 ): Promise<PlayerProfile> {
   const hero = await this.createHero();
   try {
-    const steamId = new SteamID(steamId64).getSteam2RenderedID(true).replace('STEAM_', '');
-
     const origin = 'https://play.esea.net/api';
-    const userSearchUrl = `${origin}/search?query=${steamId}&index=users`;
 
     this.debug(`Going to ${origin}`);
     const originResponse = await hero.goto(origin, { timeoutMs: this.timeout });
@@ -156,18 +172,9 @@ export async function getPlayerFromSteamId64(
       throw new Error(`play.esea.net returned a non-200 response: ${statusCode}`);
     }
 
-    this.debug(`Fetching ${userSearchUrl}`);
-    const userResponse = await fetch(hero, userSearchUrl);
-
-    const userProfile = userResponse.data[0];
+    const playerProfile = await getPlayerProfile(hero, steamId64);
 
     await hero.close();
-
-    const playerProfile: PlayerProfile = {
-      alias: userProfile.title,
-      id: userProfile.link.replace('/users/', ''),
-      link: userProfile.link,
-    };
 
     return playerProfile;
   } catch (err) {

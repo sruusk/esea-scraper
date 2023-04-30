@@ -47,8 +47,30 @@ describe('The player scrapers', () => {
     );
   });
 
-  it('should return all statistics', async () => {
+  it('should return all statistics for a valid ESEA id', async () => {
     const response = await scraper.getPlayer('440390');
+    expect(response.summary).toMatchObject({
+      age: expect.any(Number),
+      alias: expect.any(String),
+      id: expect.any(Number),
+      tier: expect.any(String),
+    });
+    expect(response.stats).toMatchObject({
+      killDeathRatio: expect.any(Number),
+      kills: expect.any(Number),
+      deaths: expect.any(Number),
+      wins: expect.any(Number),
+      rank: expect.any(String),
+      mmr: expect.any(Number),
+      lastGameDate: expect.any(String),
+      matches: expect.any(Number),
+      headshotRate: expect.any(Number),
+      averageDamageRound: expect.any(Number),
+    });
+  });
+
+  it('should return all statistics for a valid SteamID64', async () => {
+    const response = await scraper.getPlayer('76561198107663925');
     expect(response.summary).toMatchObject({
       age: expect.any(Number),
       alias: expect.any(String),
