@@ -1,5 +1,7 @@
+/* eslint-disable object-shorthand */
 import Hero from '@ulixee/hero';
-import { PlayerOutput } from './player-types';
+import SteamID from 'steamid';
+import { PlayerOutput, PlayerProfile } from './player-types';
 import { EseaScraper } from './index';
 
 async function fetch(hero: Omit<Hero, 'then'>, url: string): Promise<any> {
@@ -17,6 +19,7 @@ function getStat(
   parseFunc: typeof parseInt | typeof parseFloat,
   statName: string
 ): number {
+  // eslint-disable-next-line no-restricted-syntax
   for (const stat of stats) {
     if (stat.name === statName) {
       return parseFunc(stat.value, 10);
@@ -31,19 +34,19 @@ export async function getPlayer(
 ): Promise<PlayerOutput> {
   const hero = await this.createHero();
   try {
-    let origin = 'https://play.esea.net/api';
-    let userUrl = `${origin}/users/${eseaProfileId}`;
-    let profileUrl = `${origin}/users/${eseaProfileId}/profile`;
-    let statsUrl = `${origin}/users/${eseaProfileId}/stats?filters[type_scopes]=pug&filters[period_types]=career`;
-    let lastMatchUrl = `${origin}/users/${eseaProfileId}/matches?page_size=1`;
+    const origin = 'https://play.esea.net/api';
+    const userUrl = `${origin}/users/${eseaProfileId}`;
+    const profileUrl = `${origin}/users/${eseaProfileId}/profile`;
+    const statsUrl = `${origin}/users/${eseaProfileId}/stats?filters[type_scopes]=pug&filters[period_types]=career`;
+    const lastMatchUrl = `${origin}/users/${eseaProfileId}/matches?page_size=1`;
 
     this.debug(`Going to ${origin}`);
     const originResponse = await hero.goto(origin, { timeoutMs: this.timeout });
-    const statusCode = originResponse.response.statusCode;
+    const { statusCode } = originResponse.response;
     if (statusCode !== 200) {
       // Check for cloudflare challenge
-      const title = await hero.document.querySelector("title");
-      if(title != undefined && await title.textContent === "Attention Required! | Cloudflare"){
+      const title = hero.document.querySelector('title');
+      if (title !== undefined && (await title.textContent) === 'Attention Required! | Cloudflare') {
         throw new Error(`play.esea.net returned a non-200 response: ${statusCode}
         Received cloudflare challenge. This is likely caused by an untrusted IP.`);
       }
@@ -91,7 +94,8 @@ export async function getPlayer(
 
     this.debug(`Fetching ${lastMatchUrl}`);
     const lastMatchResponse = await fetch(hero, lastMatchUrl);
-    const lastGameDate = lastMatchResponse.data.length > 0 ? lastMatchResponse.data[0].completed_at : undefined;
+    const lastGameDate =
+      lastMatchResponse.data.length > 0 ? lastMatchResponse.data[0].completed_at : undefined;
 
     await hero.close();
 
@@ -103,7 +107,7 @@ export async function getPlayer(
         banType: user.ban ? user.ban : undefined,
         id: user.id,
         name: user.name,
-        twitch_username: user.twitch_username ? user.twitch_username : undefined,
+        twitch_username: user.twitch_username ?? undefined,
         tier: user.tier,
       },
       stats: {
@@ -112,13 +116,60 @@ export async function getPlayer(
         kills: kills,
         deaths: deaths,
         rank: !profile.rank.placement_matches_remaining ? profile.rank.current.rank : undefined,
-        mmr: !profile.rank.placement_matches_remaining ? parseInt(profile.rank.current.mmr, 10) : undefined,
+        mmr: !profile.rank.placement_matches_remaining
+          ? parseInt(profile.rank.current.mmr, 10)
+          : undefined,
         matches: totalGames,
         headshotRate: getStat(stats.stats, parseFloat, 'all.hs_percentage'),
         averageDamageRound: getStat(stats.stats, parseFloat, 'all.adr'),
         lastGameDate: lastGameDate,
       },
     };
+  } catch (err) {
+    await hero.close();
+    throw err;
+  }
+}
+
+export async function getPlayerFromSteamId64(
+  this: EseaScraper,
+  steamId64: string
+): Promise<PlayerProfile> {
+  const hero = await this.createHero();
+  try {
+    const steamId = new SteamID(steamId64).getSteam2RenderedID(true).replace('STEAM_', '');
+
+    const origin = 'https://play.esea.net/api';
+    const userSearchUrl = `${origin}/search?query=${steamId}&index=users`;
+
+    this.debug(`Going to ${origin}`);
+    const originResponse = await hero.goto(origin, { timeoutMs: this.timeout });
+    const { statusCode } = originResponse.response;
+    if (statusCode !== 200) {
+      // Check for cloudflare challenge
+      const title = hero.document.querySelector('title');
+      if (title && (await title.textContent) === 'Attention Required! | Cloudflare') {
+        throw new Error(`play.esea.net returned a non-200 response: ${statusCode}
+        Received cloudflare challenge. This is likely caused by an untrusted IP.`);
+      }
+      // noinspection ExceptionCaughtLocallyJS
+      throw new Error(`play.esea.net returned a non-200 response: ${statusCode}`);
+    }
+
+    this.debug(`Fetching ${userSearchUrl}`);
+    const userResponse = await fetch(hero, userSearchUrl);
+
+    const userProfile = userResponse.data[0];
+
+    await hero.close();
+
+    const playerProfile: PlayerProfile = {
+      alias: userProfile.title,
+      id: userProfile.link.replace('/users/', ''),
+      link: userProfile.link,
+    };
+
+    return playerProfile;
   } catch (err) {
     await hero.close();
     throw err;

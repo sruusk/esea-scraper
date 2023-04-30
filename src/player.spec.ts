@@ -28,7 +28,7 @@ describe('The player scrapers', () => {
     ];
 
     const results = await Promise.all(
-        eseaIDs.map(async (eseaId) => {
+      eseaIDs.map(async (eseaId) => {
         const resp = await scraper.getPlayer(eseaId);
         expect(resp.summary).toMatchObject({
           age: expect.any(Number),
@@ -48,24 +48,54 @@ describe('The player scrapers', () => {
   });
 
   it('should return all statistics', async () => {
-      const response = await scraper.getPlayer('440390');
-      expect(response.summary).toMatchObject({
-        age: expect.any(Number),
-        alias: expect.any(String),
-        id: expect.any(Number),
-        tier: expect.any(String),
-      });
-      expect(response.stats).toMatchObject({
-        killDeathRatio: expect.any(Number),
-        kills: expect.any(Number),
-        deaths: expect.any(Number),
-        wins: expect.any(Number),
-        rank: expect.any(String),
-        mmr: expect.any(Number),
-        lastGameDate: expect.any(String),
-        matches: expect.any(Number),
-        headshotRate: expect.any(Number),
-        averageDamageRound: expect.any(Number),
-      });
+    const response = await scraper.getPlayer('440390');
+    expect(response.summary).toMatchObject({
+      age: expect.any(Number),
+      alias: expect.any(String),
+      id: expect.any(Number),
+      tier: expect.any(String),
+    });
+    expect(response.stats).toMatchObject({
+      killDeathRatio: expect.any(Number),
+      kills: expect.any(Number),
+      deaths: expect.any(Number),
+      wins: expect.any(Number),
+      rank: expect.any(String),
+      mmr: expect.any(Number),
+      lastGameDate: expect.any(String),
+      matches: expect.any(Number),
+      headshotRate: expect.any(Number),
+      averageDamageRound: expect.any(Number),
+    });
+  });
+
+  it('should return esea profile for valid steamid', async () => {
+    const response = await scraper.getPlayerFromSteamId64('76561198162880095');
+
+    expect(response).toMatchObject({
+      alias: expect.stringMatching('shoobie'),
+      id: expect.stringMatching('1205171'),
+      link: expect.stringMatching('/users/1205171'),
+    });
+  });
+
+  it('should return error for invalid steamid', async () => {
+    let err;
+    let err2;
+
+    try {
+      await scraper.getPlayerFromSteamId64('Invalid Steam Id');
+    } catch (error) {
+      err = error;
+    }
+
+    try {
+      await scraper.getPlayerFromSteamId64('99999999999999999');
+    } catch (error) {
+      err2 = error;
+    }
+
+    expect(err).toBeInstanceOf(Error);
+    expect(err2).toBeInstanceOf(Error);
   });
 });

@@ -32,7 +32,7 @@ export default class LocalHero extends DefaultHero {
     if (localCreateOptions.connectionToCore instanceof ConnectionToHeroCore) {
       connectionOptions = localCreateOptions.connectionToCore.options;
     } else {
-      connectionOptions = localCreateOptions.connectionToCore;
+      connectionOptions = localCreateOptions.connectionToCore as IConnectionToCoreOptions;
     }
     const createConnectionResp = await createConnectionToCore(connectionOptions);
     localCreateOptions.connectionToCore = createConnectionResp.connection;

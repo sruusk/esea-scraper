@@ -33,3 +33,9 @@ export interface PlayerOutput {
   summary: PlayerSummary;
   stats?: PlayerStats;
 }
+
+export interface PlayerProfile {
+  alias: string;
+  id: string;
+  link: string;
+}
