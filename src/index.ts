@@ -54,7 +54,9 @@ export class EseaScraper {
 
   constructor(options?: ScraperOptions) {
     this.heroOptions = {
-      blockedResourceTypes: [],
+      // https://ulixee.org/docs/hero/overview/configuration#blocked-resources
+      // Blocking 'All' should work, since we are only looking for JSON responses from the API
+      blockedResourceTypes: ['All'],
       ...options?.heroOverrides,
     };
     this.timeout = options?.timeout ?? this.timeout;
